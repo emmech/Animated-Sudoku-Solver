@@ -1,5 +1,4 @@
 import 'sudoku_globals.dart';
-import 'step_solve_1.dart';
 
 const int N = 9;
 const String UNASSIGNED = '';
@@ -91,18 +90,13 @@ String checkSudoku() {
   return '';
 }
 
-String SolveSudoku() {
+String backtrack() {
   while (true) {
     iterations++;
     if (!FindUnassignedLocation(rowcol)) {
       return 'Solved';
-//      if (iterations == 1)
-//        return 'Solved';
-//      else
-//        return 'Solved in $iterations iterations and $bt backtracks'; // success!
     }
-    if (iterations >= MAX_ITERATIONS)
-      return 'Could not solve in $iterations iterations';
+    if (iterations >= MAX_ITERATIONS) return 'Try again without animation';
 
     bool added = false;
     for (int val = currentVal + 1; val <= 9; val++) {
@@ -110,7 +104,7 @@ String SolveSudoku() {
           !choices[rowcol.row][rowcol.col].contains(val.toString())) continue;
       if (isSafe(rowcol.row, rowcol.col, val)) {
         solved[rowcol.row][rowcol.col] = val.toString();
-        orig[rowcol.row][rowcol.col] = choices[rowcol.row][rowcol.col];
+        btchoices[rowcol.row][rowcol.col] = choices[rowcol.row][rowcol.col];
         choices[rowcol.row][rowcol.col] = "";
         added = true;
         rq.addFirst(rowcol.row.toString());
@@ -129,7 +123,7 @@ String SolveSudoku() {
       rowcol.row = int.parse(rq.first);
       rowcol.col = int.parse(cq.first);
       solved[rowcol.row][rowcol.col] = UNASSIGNED;
-      choices[rowcol.row][rowcol.col] = orig[rowcol.row][rowcol.col];
+      choices[rowcol.row][rowcol.col] = btchoices[rowcol.row][rowcol.col];
       currentVal = int.parse(vq.first);
       rq.removeFirst();
       cq.removeFirst();

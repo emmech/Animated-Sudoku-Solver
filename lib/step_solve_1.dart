@@ -31,6 +31,7 @@ bool checkSingles() {
         solved[row][col] = choices[row][col];
         removeFromChoices(solved[row][col], row, col);
         found = true;
+        return found;
       }
     }
   return found;

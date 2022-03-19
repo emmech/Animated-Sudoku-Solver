@@ -165,14 +165,6 @@ class SmallSquare extends StatelessWidget {
         _row3[0] +
         _row3[1] +
         _row3[2];
-/*    print('here');
-    if (row == 0 && col == 0) {
-      print('_squareArea = $_squareArea');
-      print('_letterArea = $_letterArea');
-      print('_pixelOfLetter = $_pixelOfLetter');
-      print('_fontSize = $_fontSize');
-      print('_formattedChoices = $_formattedChoices');
-    } */
   }
 }
 

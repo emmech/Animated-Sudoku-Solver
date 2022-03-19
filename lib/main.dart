@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'fastbacktrack.dart';
 import 'step_solve_1.dart';
 import 'step_solve_2.dart';
 import 'backtrack.dart';
@@ -53,22 +54,48 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  clearGrid(g) {
+    for (int i = 0; i <= 8; i++) for (int j = 0; j <= 8; j++) g[i][j] = '';
+  }
+
+  clearBTS() {
+    for (int i = 0; i <= 8; i++) for (int j = 0; j <= 8; j++) bts[i][j] = 0;
+  }
+
   clearFunc() {
+    row = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    col = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    box = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    clearBTS();
     _errorMsg = '';
-    solveStarted = false;
     starting = true;
     setState(() {
-      for (int i = 0; i <= 8; i++)
-        for (int j = 0; j <= 8; j++) {
-          solved[i][j] = '';
-          choices[i][j] = '';
-          orig[i][j] = '';
-        }
+      clearGrid(solved);
+      clearGrid(choices);
+      clearGrid(orig);
     });
   }
 
   void copySudoku(f, t) {
     for (int i = 0; i < 9; i++) for (int j = 0; j < 9; j++) t[i][j] = f[i][j];
+  }
+
+  void copyToBTS() {
+    for (int i = 0; i < 9; i++)
+      for (int j = 0; j < 9; j++)
+        if (solved[i][j] == "")
+          bts[i][j] = 0;
+        else
+          bts[i][j] = int.parse(solved[i][j]);
+  }
+
+  void copyFromBTS() {
+    for (int i = 0; i < 9; i++)
+      for (int j = 0; j < 9; j++)
+        if (bts[i][j] == 0)
+          solved[i][j] = "";
+        else
+          solved[i][j] = bts[i][j].toString();
   }
 
   void saveFunc() {
@@ -83,53 +110,50 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   solve() async {
-    solveStarted = true;
+    copySudoku(solved, orig);
     _errorMsg = '';
 
     setState(() {
       _errorMsg = checkSudoku();
     });
     if (_errorMsg == '') {
-      await stepSolve1();
-      await stepSolve2();
-      await forceSolveFunc();
+      if (animate) {
+        await stepSolve1();
+        await stepSolve2();
+        await forceSolveFunc();
+      } else {
+        await forceSolveFunc2();
+      }
     }
-    solveStarted = false;
   }
 
   stepSolve1() async {
-    bool stepSolveDone = false;
-    while (stepSolveDone == false) {
+    bool stepSolving = true;
+    while (stepSolving == true) {
       setState(() {
         _errorMsg = checkSudoku();
         if (_errorMsg != '') {
           _errorMsg = 'No Solutions';
-          stepSolveDone = true;
+          stepSolving = false;
           return;
         }
-        if (solveForSingles() == false) {
-          stepSolveDone = true;
-          return;
-        }
+        stepSolving = solveForSingles();
       });
       if (animate) await new Future.delayed(const Duration(milliseconds: 200));
     }
   }
 
   stepSolve2() async {
-    bool stepSolveDone = false;
-    while (stepSolveDone == false) {
+    bool stepSolving = true;
+    while (stepSolving == true) {
       setState(() {
         _errorMsg = checkSudoku();
         if (_errorMsg != '') {
           _errorMsg = 'No Solutions';
-          stepSolveDone = true;
+          stepSolving = false;
           return;
         }
-        if (solveForNakedPairs() == false) {
-          stepSolveDone = true;
-          return;
-        }
+        stepSolving = solveForNakedPairs();
       });
       if (animate) await new Future.delayed(const Duration(milliseconds: 200));
     }
@@ -143,16 +167,46 @@ class _MyHomePageState extends State<MyHomePage> {
     vq = new Queue();
     iterations = 0;
     bt = 0;
+    bool prev = animate;
     while (_errorMsg == "") {
+      // if animate is turned off, revert to fastbacktrack
+      if (prev != animate) {
+        prev = animate;
+        copySudoku(orig, solved);
+        clearGrid(choices);
+        copyToBTS();
+        _errorMsg = fastBacktrack();
+        copyFromBTS();
+        return;
+      }
       setState(() {
         _errorMsg = checkSudoku();
         if (_errorMsg != '') {
           return;
         }
-        _errorMsg = SolveSudoku();
+        _errorMsg = backtrack();
+        if ((_errorMsg != 'Solved' && _errorMsg != '') || !animate) {
+          copySudoku(orig, solved);
+          clearGrid(choices);
+          copyToBTS();
+          _errorMsg = fastBacktrack();
+          copyFromBTS();
+        }
       });
       if (animate) await new Future.delayed(const Duration(microseconds: 1));
     }
+  }
+
+  forceSolveFunc2() async {
+    copyToBTS();
+    setState(() {
+      _errorMsg = checkSudoku();
+      if (_errorMsg != '') {
+        return;
+      }
+      _errorMsg = fastBacktrack();
+      copyFromBTS();
+    });
   }
 
   @override
