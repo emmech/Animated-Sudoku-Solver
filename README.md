@@ -3,9 +3,9 @@ Sudoku solver with animation to show progress
 
 A mobile app based on Flutter to help solve Sudoku
 
-Instead of just showing the solution, the app displays progress as it solves using basic techniques and finally, if required, backtracking.
+Instead of just showing the solution, the app displays progress as it solves using basic techniques and finally, if required, dlx algorithm.
 
-The app uses basic techniques such as searching for singles and naked pairs. If someone want to add other techniques such as hidden pairs, triples, swordfish, etc., please do so.
+The app uses basic techniques such as searching for singles and naked pairs. If someone wants to add other techniques such as hidden pairs, triples, swordfish, etc., please do so.
 
 How to build:
 
