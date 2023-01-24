@@ -4,6 +4,13 @@ const int N = 9;
 const String UNASSIGNED = '';
 const int MAX_ITERATIONS = 3000000;
 
+bool IsSolved() {
+  for (int row = 0; row < N; row++)
+    for (int col = 0; col < N; col++)
+      if (solved[row][col] == UNASSIGNED) return false;
+  return true;
+}
+
 bool DupInRow(row, colToAvoid, val) {
   for (int col = 0; col < N; col++) {
     if (col == colToAvoid) continue;

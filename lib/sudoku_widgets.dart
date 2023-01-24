@@ -48,7 +48,7 @@ class SmallSquare extends StatelessWidget {
           _formattedChoices,
           maxLines: 3,
           style: GoogleFonts.spaceMono(
-              fontSize: _fontSize,
+              fontSize: _fontSize - 2,
               color: Colors.lightGreen,
               height: 1,
               letterSpacing: 4),

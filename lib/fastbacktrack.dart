@@ -73,10 +73,7 @@ bool solveSudoku(int i, int j) {
 String fastBacktrack() {
   iter = 0;
   seted = false;
-  var startTime = DateTime.now().millisecondsSinceEpoch;
   bool solved = solveSudoku(0, 0);
-  var timeUsed = DateTime.now().millisecondsSinceEpoch - startTime;
-//  print("time: $timeUsed iterations: $iter");
   if (solved)
     return ("Solved");
   else

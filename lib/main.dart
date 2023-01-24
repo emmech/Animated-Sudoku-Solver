@@ -6,6 +6,7 @@ import 'step_solve_2.dart';
 import 'backtrack.dart';
 import 'sudoku_widgets.dart';
 import 'sudoku_globals.dart';
+import 'dancinglinks.dart';
 import 'dart:async';
 import 'dart:collection';
 
@@ -169,13 +170,13 @@ class _MyHomePageState extends State<MyHomePage> {
     bt = 0;
     bool prev = animate;
     while (_errorMsg == "") {
-      // if animate is turned off, revert to fastbacktrack
+      // if animate is turned off, revert to fastbacktrack or dlx
       if (prev != animate) {
         prev = animate;
         copySudoku(orig, solved);
         clearGrid(choices);
         copyToBTS();
-        _errorMsg = fastBacktrack();
+        _errorMsg = dancingLinks();
         copyFromBTS();
         return;
       }
@@ -189,8 +190,9 @@ class _MyHomePageState extends State<MyHomePage> {
           copySudoku(orig, solved);
           clearGrid(choices);
           copyToBTS();
-          _errorMsg = fastBacktrack();
+          _errorMsg = dancingLinks();
           copyFromBTS();
+          return;
         }
       });
       if (animate) await new Future.delayed(const Duration(microseconds: 1));
@@ -204,9 +206,20 @@ class _MyHomePageState extends State<MyHomePage> {
       if (_errorMsg != '') {
         return;
       }
-      _errorMsg = fastBacktrack();
+//      _errorMsg = fastBacktrack();
+      _errorMsg = dancingLinks();
       copyFromBTS();
     });
+  }
+
+  checkIfSolved() async {
+    setState(() {
+      if (IsSolved())
+        _errorMsg = "Solved";
+      else
+        _errorMsg = "Could not solve, try without animation";
+    });
+    if (animate) await new Future.delayed(const Duration(microseconds: 1));
   }
 
   @override

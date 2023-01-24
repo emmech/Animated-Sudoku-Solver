@@ -86,6 +86,9 @@ class RowCol {
   int col = 0;
 }
 
+int rowx = 0;
+int colx = 0;
+String choice = '';
 var rowcol = new RowCol();
 Queue<String> rq = new Queue();
 Queue<String> cq = new Queue();
